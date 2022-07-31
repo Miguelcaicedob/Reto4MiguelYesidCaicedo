@@ -98,8 +98,7 @@ public class GestionarSucursalesForm extends javax.swing.JDialog {
                     
                 }catch(SQLException e){
                     System.out.println(e);
-                
-                
+
                 }
             } 
         } catch(SQLException e){
