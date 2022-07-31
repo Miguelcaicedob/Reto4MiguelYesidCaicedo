@@ -1,6 +1,7 @@
 
 package vistas;
 
+
 import Modelo.Conexion;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -10,20 +11,24 @@ import javax.swing.JOptionPane;
 
 public class ShowUserForm extends javax.swing.JDialog {
     
-    Conexion conexion = new Conexion();
+    Conexion conexion = new Conexion(); 
     Connection connection; 
     Statement st; 
     ResultSet rs; 
+
  
-    
     public ShowUserForm(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         this.setLocationRelativeTo(parent);
-    } // necesito crear un metodo que reciba los datos que le va a pasar el adduser
-    public void recibirDatos( int idEmp, String nombres, String apellidos, String tipoDocumento, String documento, String correo){
-        // convertir el int idEmp en string con "", recuerda que siempre que vas a escribir en un texfild tiene que ser cadena de texto
+
+    } 
+
+
+    public void recibirDatos( int idEmp, String nombreSucursal, String nombres, String apellidos, String tipoDocumento, String documento, String correo){
+        
         txtidEmp.setText("" + idEmp);
+        txtSucursal.setText(nombreSucursal);
         txtNombre.setText(nombres);
         txtApellidos.setText(apellidos);
         txtTipoDocumento.setText(tipoDocumento);
@@ -34,9 +39,6 @@ public class ShowUserForm extends javax.swing.JDialog {
     }
     
     public void actualizarEmpleado(){
-        //1. Capturar los valores de los campos textfield editables
-        //2. convertir el texto de textfield en numero 
-        //int numero = Integer.parseInt("4") // deja de ser texto y pasa a ser numero
         int idEmp = Integer.parseInt(txtidEmp.getText());
         String nombreEmp = txtNombre.getText();
         String apellidos = txtApellidos.getText();
@@ -49,7 +51,7 @@ public class ShowUserForm extends javax.swing.JDialog {
         }else if (email.isEmpty()){
             JOptionPane.showMessageDialog(this, "El correo electronico del empleado esta vacio","", JOptionPane.WARNING_MESSAGE);
         }else{
-            String query = "UPDATE `empleados` SET `nombreEmp`='"+nombreEmp+"',`apellidos`='"+apellidos+"',`correo`='"+email+"' WHERE idEmp = "+idEmp+" ; ";
+            String query = "UPDATE `empleado` SET `nombreEmp`='"+nombreEmp+"',`apellidos`='"+apellidos+"',`correo`='"+email+"' WHERE idEmp = "+idEmp+" ; ";
             System.out.println(query);
             try{
                 connection = conexion.getConnection();
@@ -64,7 +66,7 @@ public class ShowUserForm extends javax.swing.JDialog {
     }
     public void eliminarEmpleado(){
         int idEmp = Integer.parseInt(txtidEmp.getText()); // sentencia para delete, necesita del where, donde se pone la llave donde es el id 
-        String query = "DELETE FROM `empleados` WHERE idEmp = "+idEmp+";"; 
+        String query = "DELETE FROM `empleado` WHERE idEmp = "+idEmp+";"; 
         try {
             connection = conexion.getConnection();
             st = connection.createStatement(); 
@@ -100,6 +102,8 @@ public class ShowUserForm extends javax.swing.JDialog {
         btnEditar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
         btnRegresar = new javax.swing.JButton();
+        jLabel8 = new javax.swing.JLabel();
+        txtSucursal = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -150,15 +154,16 @@ public class ShowUserForm extends javax.swing.JDialog {
             }
         });
 
+        jLabel8.setText("Sucursal");
+
+        txtSucursal.setEditable(false);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(184, 184, 184)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -186,29 +191,39 @@ public class ShowUserForm extends javax.swing.JDialog {
                                     .addGap(56, 56, 56)
                                     .addComponent(txtApellidos, javax.swing.GroupLayout.PREFERRED_SIZE, 249, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                            .addComponent(jLabel3)
-                                            .addGap(56, 56, 56))
-                                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                            .addGap(56, 56, 56)
-                                            .addComponent(jLabel2)
-                                            .addGap(55, 55, 55)))
+                                    .addComponent(jLabel3)
+                                    .addGap(56, 56, 56)
                                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 249, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(txtidEmp, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)))))))
-                .addContainerGap(195, Short.MAX_VALUE))
+                                        .addComponent(txtidEmp, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(txtSucursal, javax.swing.GroupLayout.PREFERRED_SIZE, 249, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel8)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(50, 50, 50)
+                                .addComponent(jLabel2)))))
+                .addContainerGap(215, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(24, 24, 24)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(txtidEmp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(50, 50, 50))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(txtidEmp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel8)
+                            .addComponent(txtSucursal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(4, 4, 4)))
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -240,10 +255,7 @@ public class ShowUserForm extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -296,11 +308,13 @@ public class ShowUserForm extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JTextField txtApellidos;
     private javax.swing.JTextField txtCorreo;
     private javax.swing.JTextField txtDocumento;
     private javax.swing.JTextField txtNombre;
+    private javax.swing.JTextField txtSucursal;
     private javax.swing.JTextField txtTipoDocumento;
     private javax.swing.JTextField txtidEmp;
     // End of variables declaration//GEN-END:variables

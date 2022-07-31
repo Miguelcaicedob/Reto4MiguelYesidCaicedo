@@ -1,4 +1,5 @@
 package vistas;
+import Controlador.*;
 import Modelo.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -30,16 +31,17 @@ public class UserMenu extends javax.swing.JFrame {
     private void listarDepartamentos(){
         String filtro = txtSearchSucursal.getText(); 
         if(filtro.isEmpty()){
-           String query = "SELECT nombreSucursal, nombreDepartamento FROM `sucursal` INNER JOIN `direccion` WHERE idDireccion = FK_idDireccion GROUP BY nombreDepartamento, nombreSucursal;";
+           String query = "SELECT nombreSucursal, nombreDepartamento, CONCAT('zona', zona, '. ', tipoCalle, ' ', numero1, ' #No, ', numero2, ' - ', numero3) as direccion FROM `sucursal` INNER JOIN `direccion` WHERE idDireccion = FK_idDireccion GROUP BY nombreDepartamento, nombreSucursal;";
            try{
                connection = conexion.getConnection();
                st = connection.createStatement();
                rs = st.executeQuery(query); 
-               Object [] departamento = new Object [2];
+               Object [] departamento = new Object [3];
                contenidoTablaDepartamentos =(DefaultTableModel)tblDepartamentos.getModel();
                while (rs.next()){
                    departamento[0] = rs.getString("nombreSucursal");
                    departamento[1] = rs.getString("nombreDepartamento");
+                   departamento[2] = rs.getString("direccion");
                    contenidoTablaDepartamentos.addRow(departamento);
                    tblDepartamentos.setModel(contenidoTablaDepartamentos);
                 }
@@ -47,17 +49,18 @@ public class UserMenu extends javax.swing.JFrame {
                 System.out.println(e);
              } 
          } else{
-            String filtroSucursales = "SELECT nombreSucursal, nombreDepartamento FROM `sucursal` INNER JOIN `direccion` ON idDireccion = FK_idDireccion AND nombreDepartamento LIKE '%"+filtro+"%';";
+            String filtroSucursales = "SELECT nombreSucursal, nombreDepartamento, CONCAT('zona', zona, '. ', tipoCalle, ' ', numero1, ' #No, ', numero2, ' - ', numero3) as direccion FROM `sucursal` INNER JOIN `direccion` WHERE idDireccion = FK_idDireccion AND nombreDepartamento LIKE '%"+filtro+"%' GROUP BY nombreDepartamento, nombreSucursal;";
             System.out.println(filtroSucursales);
             try{
                 connection = conexion.getConnection();
                 st = connection.createStatement();
                 rs = st.executeQuery(filtroSucursales);
-                Object [] departamento = new Object [2]; 
+                Object [] departamento = new Object [3]; 
                 contenidoTablaDepartamentos =(DefaultTableModel)tblDepartamentos.getModel();
                 while (rs.next()){
                     departamento[0] = rs.getString("nombreSucursal");
                     departamento[1] = rs.getString("nombreDepartamento");
+                    departamento[2] = rs.getString("direccion");
                     contenidoTablaDepartamentos.addRow(departamento);
                     tblDepartamentos.setModel(contenidoTablaDepartamentos);
                 }
@@ -86,7 +89,7 @@ public class UserMenu extends javax.swing.JFrame {
         String filtroBusqueda = txtSearch.getText();
         // si no hay nada en el campo de busqueda se cargaran todos los emplados 
         if(filtroBusqueda.isEmpty()){
-            String query  = "SELECT * FROM empleados";
+            String query  = "SELECT nombreEmp, apellidos, tipoDocumento, documento, correo, nombreSucursal FROM empleado INNER JOIN sucursal ON empleado.FK_idSucursal = sucursal.idSucursal;";
             try {
                 connection = conexion.getConnection();
                 st = connection.createStatement();
@@ -97,27 +100,23 @@ public class UserMenu extends javax.swing.JFrame {
                 contenidoTablaEmpleados =(DefaultTableModel)tblEmpleados.getModel();
                 // el resultado de la consulta del query nos determinara la cantidad de empleados que existe 
                 while(rs.next()){
-                    empleado[0] = rs.getInt("idEmp");
-                    empleado[1] = rs.getString("nombreEmp");
-                    empleado[2] = rs.getString("apellidos");
-                    empleado[3] = rs.getString("tipoDocumento");
-                    empleado[4] = rs.getString("documento");
-                    empleado[5] = rs.getString("correo");
+                    empleado[0] = rs.getString("nombreEmp");
+                    empleado[1] = rs.getString("apellidos");
+                    empleado[2] = rs.getString("tipoDocumento");
+                    empleado[3] = rs.getString("documento");
+                    empleado[4] = rs.getString("correo");
+                    empleado[5] = rs.getString("nombreSucursal");
                     // creamos una nueva fila con los 5 atributos del objeto empleado
                     contenidoTablaEmpleados.addRow(empleado);
                     tblEmpleados.setModel(contenidoTablaEmpleados);
-                    System.out.println("idEmp: "+ empleado[0]+ ", nombre: " +empleado [1] 
-                            +  " Apellido: " + empleado[2] + "tipoDocumento " + empleado[3]
-                            + ", documento " + empleado[4]+ " correo " + empleado[5]); 
                 }
-
-
+                
             } catch(SQLException e){
                 System.out.println("No se pudo cargar la información de los empleados");
 
             }
         }else{ 
-            String query = "SELECT * FROM empleados WHERE nombreEmp LIKE '%"+filtroBusqueda+"%' OR apellidos LIKE '%"+filtroBusqueda+"%';";
+            String query = "SELECT nombreEmp, apellidos, tipoDocumento, documento, correo, nombreSucursal FROM empleado INNER JOIN sucursal WHERE empleado.FK_idSucursal = sucursal.idSucursal AND nombreEmp LIKE '%"+filtroBusqueda+"%' OR apellidos LIKE '%"+filtroBusqueda+"%';";
             try {
                 connection = conexion.getConnection();
                 st = connection.createStatement();
@@ -125,17 +124,14 @@ public class UserMenu extends javax.swing.JFrame {
                 Object [] empleado = new Object [6]; // el 5 da lugar al numero de columnas, tamaño del objeto
                 contenidoTablaEmpleados =(DefaultTableModel)tblEmpleados.getModel(); 
                 while(rs.next()){
-                    empleado[0] = rs.getInt("idEmp");
-                    empleado[1] = rs.getString("nombreEmp");
-                    empleado[2] = rs.getString("apellidos");
-                    empleado[3] = rs.getString("tipoDocumento");
-                    empleado[4] = rs.getString("documento");
-                    empleado[5] = rs.getString("correo");
+                    empleado[0] = rs.getString("nombreEmp");
+                    empleado[1] = rs.getString("apellidos");
+                    empleado[2] = rs.getString("tipoDocumento");
+                    empleado[3] = rs.getString("documento");
+                    empleado[4] = rs.getString("correo");
+                    empleado[5] = rs.getString("nombreSucursal");
                     contenidoTablaEmpleados.addRow(empleado);
                     tblEmpleados.setModel(contenidoTablaEmpleados);
-                    System.out.println("idEmp: "+ empleado[0]+ ", nombre: " +empleado [1] 
-                            +  " Apellido: " + empleado[2] + "tipoDocumento " + empleado[3]
-                            + ", documento " + empleado[4]+ " correo " + empleado[5]); 
                 }
                 
             } catch(SQLException e){
@@ -178,6 +174,7 @@ public class UserMenu extends javax.swing.JFrame {
         btnSearchSucursal = new javax.swing.JButton();
         btnAddEmpleado = new javax.swing.JButton();
         jLabel11 = new javax.swing.JLabel();
+        btnAddEmpleado1 = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -191,6 +188,8 @@ public class UserMenu extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jPanel1.setPreferredSize(new java.awt.Dimension(755, 485));
 
         jPanel2.setBackground(new java.awt.Color(204, 204, 204));
 
@@ -235,50 +234,49 @@ public class UserMenu extends javax.swing.JFrame {
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addGap(174, 174, 174)
-                        .addComponent(jLabel8))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel7)
-                            .addComponent(jLabel5))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addComponent(cbDepartamento, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jLabel6))
-                            .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addComponent(cbTipoCalle, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(txtNumero1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addGap(22, 22, 22)
+                            .addComponent(jLabel5)
+                            .addComponent(jLabel7))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(cbDepartamento, 0, 250, Short.MAX_VALUE)
+                            .addComponent(cbTipoCalle, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 54, Short.MAX_VALUE)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                                .addComponent(txtNumero1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(32, 32, 32)
                                 .addComponent(jLabel9)
-                                .addGap(18, 18, 18)
-                                .addComponent(txtNumero2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(12, 12, 12)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtNumero2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 7, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(txtNumero3, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(cbZona, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtNumero3, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                                .addComponent(jLabel6)
+                                .addGap(18, 18, 18)
+                                .addComponent(cbZona, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnGuardar)
+                        .addGap(268, 268, 268)))
+                .addGap(52, 52, 52))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(btnGuardar)
-                .addGap(196, 196, 196))
+                .addComponent(jLabel8)
+                .addGap(305, 305, 305))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGap(20, 20, 20)
+                .addGap(19, 19, 19)
                 .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(26, 26, 26)
+                .addGap(18, 18, 18)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
                     .addComponent(cbDepartamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -293,9 +291,9 @@ public class UserMenu extends javax.swing.JFrame {
                     .addComponent(txtNumero3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel10)
                     .addComponent(jLabel9))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 46, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addComponent(btnGuardar)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         tblDepartamentos.setModel(new javax.swing.table.DefaultTableModel(
@@ -303,7 +301,7 @@ public class UserMenu extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Sucursal", "Departamento"
+                "Sucursal", "Departamento", "Dirección"
             }
         ));
         tblDepartamentos.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -335,49 +333,59 @@ public class UserMenu extends javax.swing.JFrame {
 
         jLabel11.setText("Departamento");
 
+        btnAddEmpleado1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Assets/user-139 (1).png"))); // NOI18N
+        btnAddEmpleado1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddEmpleado1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(19, 19, 19)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(10, 10, 10)
-                        .addComponent(jLabel11)
-                        .addGap(18, 18, 18)
-                        .addComponent(txtSearchSucursal, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnSearchSucursal, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 327, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnAddEmpleado)))
-                .addContainerGap(51, Short.MAX_VALUE))
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(jLabel11)
+                                .addGap(18, 18, 18)
+                                .addComponent(txtSearchSucursal, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnSearchSucursal, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 643, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(26, 26, 26)
+                        .addComponent(btnAddEmpleado1)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 510, Short.MAX_VALUE)
+                .addComponent(btnAddEmpleado))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(95, 95, 95)
-                        .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(171, 171, 171)
+                        .addComponent(btnAddEmpleado, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(16, 16, 16)
+                        .addGap(27, 27, 27)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(jLabel11)
+                                .addComponent(txtSearchSucursal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(btnSearchSucursal))
+                        .addGap(29, 29, 29)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(btnSearchSucursal)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 364, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel11)
-                                    .addComponent(txtSearchSucursal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(130, 130, 130)
-                                .addComponent(btnAddEmpleado, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap(74, Short.MAX_VALUE))
+                                .addGap(56, 56, 56)
+                                .addComponent(btnAddEmpleado1, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap(22, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -386,14 +394,14 @@ public class UserMenu extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         jTabbedPane2.addTab("Sucursales", jPanel1);
@@ -407,11 +415,11 @@ public class UserMenu extends javax.swing.JFrame {
 
             },
             new String [] {
-                "IdEmp", "Nombre", "Apellido", "Tipo de documento", "Documento", "Correo"
+                "Nombre", "Apellido(s)", "Tipo de documento", "Documento", "Correo", "Sucursal"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, true, false, false, false
+                false, true, false, false, false, true
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -461,57 +469,59 @@ public class UserMenu extends javax.swing.JFrame {
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel1)
+                .addGap(174, 174, 174)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(10, 10, 10)))
+                .addGap(929, 929, 929))
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(57, 57, 57)
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 670, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(btnAddUser, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                                        .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 421, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(30, 30, 30)
-                                        .addComponent(jToggleButton1)
-                                        .addGap(30, 30, 30)))))
-                        .addGap(105, 105, 105))
+                            .addComponent(btnAddUser, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 670, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addGap(201, 201, 201)
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(10, 10, 10)))
-                        .addGap(384, 384, 384))))
+                        .addContainerGap()
+                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(26, 26, 26)
+                        .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 421, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(39, 39, 39)
+                        .addComponent(jToggleButton1)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(0, 38, Short.MAX_VALUE)
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel3)
-                        .addGap(16, 16, 16)
+                        .addGap(17, 17, 17)
                         .addComponent(btnAddUser, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(13, 13, 13)
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jToggleButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel4))))
-                .addGap(18, 18, 18)
+                        .addGap(27, 27, 27)))
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jToggleButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4))
+                .addGap(31, 31, 31)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 177, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(127, Short.MAX_VALUE))
+                .addGap(33, 33, 33))
         );
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 876, Short.MAX_VALUE)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -527,12 +537,12 @@ public class UserMenu extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jTabbedPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 960, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jTabbedPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 806, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane2)
+            .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 485, Short.MAX_VALUE)
         );
 
         pack();
@@ -555,27 +565,30 @@ public class UserMenu extends javax.swing.JFrame {
         int filaSeleccionada = tblEmpleados.getSelectedRow();
         System.out.println("Fila Seleccionada: " + filaSeleccionada );
         // se convierte el texto que se captura de la tabla en enteros, si no le pongo el parseint, me diria que le estoy asignandole una variable string a una que asigne como entera
-        int idEmp = Integer.parseInt(tblEmpleados.getValueAt(filaSeleccionada, 0).toString());
-        String nombreEmp = tblEmpleados.getValueAt(filaSeleccionada, 1).toString();
-        String apellidos = tblEmpleados.getValueAt(filaSeleccionada, 2).toString();
-        String tipoDocumento = tblEmpleados.getValueAt(filaSeleccionada, 3).toString();
-        String documento = tblEmpleados.getValueAt(filaSeleccionada, 4).toString();
-        String correo = tblEmpleados.getValueAt(filaSeleccionada, 5).toString();
+        String nombreEmp = tblEmpleados.getValueAt(filaSeleccionada, 0).toString();
+        String apellidos = tblEmpleados.getValueAt(filaSeleccionada, 1).toString();
+        String tipoDocumento = tblEmpleados.getValueAt(filaSeleccionada, 2).toString();
+        String documento = tblEmpleados.getValueAt(filaSeleccionada, 3).toString();
+        String correo = tblEmpleados.getValueAt(filaSeleccionada, 4).toString();
+        String sucursal = tblEmpleados.getValueAt(filaSeleccionada, 5).toString();
         
-        String empleadoSeleccionado = "idEmp: " + idEmp + " nombre: " + nombreEmp +" " +"apellidos"
-                + apellidos + "documento: " + tipoDocumento + " " + documento + " correo: " + correo;
-        System.out.println(empleadoSeleccionado);
-        
-        ShowUserForm showUserForm = new ShowUserForm(this, true);
-        showUserForm.recibirDatos(idEmp, nombreEmp, apellidos, tipoDocumento, documento, correo);
-        showUserForm.setVisible(true);
-        //borrarRegistrosTabla();
-        //listarEmpleados();
-        this.borrarRegistrosTabla();
-        this.listarEmpleados();
-        
-        
-        
+        String queryIdEmpleado = "SELECT idEmp, nombreSucursal FROM `empleado` INNER JOIN sucursal WHERE sucursal.idSucursal = empleado.FK_idSucursal AND documento = '"+documento+"';";
+        try{
+            connection = conexion.getConnection();
+            st = connection.createStatement();
+            rs = st.executeQuery(queryIdEmpleado);
+            while(rs.next()){
+                int idEmpleado = rs.getInt("idEmp");
+                String nombreSucursal = rs.getString("nombreSucursal");
+                ShowUserForm showUserForm = new ShowUserForm(this, true);
+                showUserForm.recibirDatos(idEmpleado, nombreSucursal, nombreEmp, apellidos, tipoDocumento, documento, correo);
+                showUserForm.setVisible(true);
+                this.borrarRegistrosTabla();
+                this.listarEmpleados();
+            }
+        }catch(SQLException e){
+            System.out.println(e);
+        }
         
     }//GEN-LAST:event_tblEmpleadosMouseClicked
 
@@ -598,8 +611,12 @@ public class UserMenu extends javax.swing.JFrame {
         String numero1 = txtNumero1.getText();
         String numero2 = txtNumero2.getText();
         String numero3 = txtNumero3.getText();
-        String query = "INSERT INTO `direccion`(`zona`, `tipoCalle`, `numero1`, `numero2`, `numero3`, `nombreDepartamento`) VALUES ('"+ zona +"','"+ tipoCalle +"','"+ numero1 +"','"+ numero2 +"','"+ numero3 +"','"+ departamento +"');";
-        System.out.println(query);
+        
+        if (departamento.isEmpty() || numero1.isEmpty() || numero2.isEmpty() || numero3.isEmpty() ||zona.equals("SeleccionaUnaOpcion") || tipoCalle.equals("SeleccionaUnaOpcion") || departamento.equals("SeleccionaUnaOpcion") ){
+            JOptionPane.showMessageDialog(this, "Faltan Campos por diligenciar", "", JOptionPane.ERROR_MESSAGE);
+        }else{
+            String query = "INSERT INTO `direccion`(`zona`, `tipoCalle`, `numero1`, `numero2`, `numero3`, `nombreDepartamento`) VALUES ('"+ zona +"','"+ tipoCalle +"','"+ numero1 +"','"+ numero2 +"','"+ numero3 +"','"+ departamento +"');";
+            System.out.println(query);
         try{
             connection = conexion.getConnection();
             st = connection.createStatement();
@@ -619,14 +636,16 @@ public class UserMenu extends javax.swing.JFrame {
                 }
             }catch(SQLException e){
                 System.out.println(e);
-            
-            
             }
  
         }catch(SQLException e){
             System.out.println(e);
             JOptionPane.showMessageDialog(this, "No fue posible crear la direccion", "", JOptionPane.ERROR_MESSAGE);
+        }   
+            
         }
+        
+        
         
     }//GEN-LAST:event_btnGuardarActionPerformed
 
@@ -640,10 +659,44 @@ public class UserMenu extends javax.swing.JFrame {
     }//GEN-LAST:event_btnSearchSucursalActionPerformed
 
     private void tblDepartamentosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblDepartamentosMouseClicked
+        int filaSeleccionada = tblDepartamentos.getSelectedRow();
+        if(filaSeleccionada >-1){
+            String sucursal = tblDepartamentos.getValueAt(filaSeleccionada, 0).toString();
+            String departamento = tblDepartamentos.getValueAt(filaSeleccionada, 1).toString();
+            String queryDireccion = "SELECT `idDireccion`, `zona`, `tipoCalle`, `numero1`, `numero2`, `numero3` FROM `direccion`  INNER JOIN sucursal WHERE direccion.idDireccion = sucursal.FK_idDireccion AND nombreSucursal = '"+sucursal+"';";
+            try{
+                connection = conexion.getConnection();
+                st = connection.createStatement();
+                rs = st.executeQuery(queryDireccion);
+                while(rs.next()){
+                    int idDireccion = rs.getInt("idDireccion");
+                    String zona = rs.getString("zona");
+                    String tipoCalle = rs.getString("tipoCalle");
+                    String numero1 = rs.getString("numero1");
+                    String numero2 = rs.getString("numero2");
+                    String numero3 = rs.getString("numero2");
+                    GestionarSucursalesForm gestionarSucursales = new GestionarSucursalesForm(this, true); 
+                    gestionarSucursales.recibeDatosDireccion(idDireccion, departamento, sucursal, zona, tipoCalle, numero1, numero2, numero3);
+                    gestionarSucursales.setVisible(true);
+                }
+                borrarRegistrosTablaDepartamentos();
+                listarDepartamentos();
+                
+            }catch(SQLException e){
+                System.out.println(e);
+            }
+            
 
+        }
+
+        
     }//GEN-LAST:event_tblDepartamentosMouseClicked
 
     private void btnAddEmpleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddEmpleadoActionPerformed
+
+    }//GEN-LAST:event_btnAddEmpleadoActionPerformed
+
+    private void btnAddEmpleado1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddEmpleado1ActionPerformed
         int filaSeleccionada = tblDepartamentos.getSelectedRow();
         if(filaSeleccionada == -1){
             JOptionPane.showMessageDialog(this, "Debes Seleccionar una sucursal", "Gestion sucursales", JOptionPane.ERROR_MESSAGE );
@@ -667,7 +720,7 @@ public class UserMenu extends javax.swing.JFrame {
                 System.out.println(e);
             }
             }
-    }//GEN-LAST:event_btnAddEmpleadoActionPerformed
+    }//GEN-LAST:event_btnAddEmpleado1ActionPerformed
     
     
    
@@ -682,6 +735,7 @@ public class UserMenu extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddEmpleado;
+    private javax.swing.JButton btnAddEmpleado1;
     private javax.swing.JButton btnAddUser;
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnSearchSucursal;

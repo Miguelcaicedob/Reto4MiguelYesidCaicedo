@@ -42,7 +42,7 @@ public class SucursalForm extends javax.swing.JDialog {
         txtSucursal = new javax.swing.JTextField();
         btnGuardar = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
 
         jPanel1.setBackground(new java.awt.Color(153, 153, 153));
 
@@ -103,11 +103,14 @@ public class SucursalForm extends javax.swing.JDialog {
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
         String sucursal = txtSucursal.getText();
-        if(sucursal.isEmpty())
+        if(sucursal.isEmpty()){
             JOptionPane.showMessageDialog(this, "El nombre de la sucursal es requerido", "Sucursal", JOptionPane.ERROR_MESSAGE);
-        this.dispose();
+        }else{
+             this.dispose();
+        }
     }//GEN-LAST:event_btnGuardarActionPerformed
 
+    
 
     public static void main(String args[]) {
 

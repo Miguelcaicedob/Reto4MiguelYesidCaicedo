@@ -1,10 +1,14 @@
 package vistas;
 
-import Modelo.*;
+import Controlador.*;
+import Modelo.Conexion;
+import Modelo.Sucursal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Iterator;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
@@ -15,14 +19,30 @@ public class AddUserForm extends javax.swing.JDialog {
     Connection connection;
     Statement st;
     ResultSet rs;
+    CbSucursal cbSucursales;
+    ArrayList mListaSucursales;
+    
 
     public AddUserForm(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         enumTipoDocumento = new DefaultComboBoxModel(EnumTipoDocumento.values());
         initComponents();
         this.setLocationRelativeTo(parent);
+        cbSucursales = new CbSucursal();
+        mListaSucursales = new ArrayList();
+        llenarComboboxSucursales();
 
     }
+    public void llenarComboboxSucursales(){
+        mListaSucursales =  cbSucursales.getListaSucursales();
+        Iterator iterator = mListaSucursales.iterator();
+        while(iterator.hasNext()){
+            Sucursal sucursal = (Sucursal)iterator.next();
+            cbSucursal.addItem(sucursal);
+        }
+    
+    }
+    
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -32,19 +52,21 @@ public class AddUserForm extends javax.swing.JDialog {
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        txtName = new javax.swing.JTextField();
+        txtNombre = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        txtLastName = new javax.swing.JTextField();
+        txtApellidos = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
-        txtEmail = new javax.swing.JTextField();
-        txtIDNumber = new javax.swing.JTextField();
+        txtCorreo = new javax.swing.JTextField();
+        txtDocumento = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
-        cbIDType = new javax.swing.JComboBox<>();
+        cbTipoDocumento = new javax.swing.JComboBox<>();
         jLabel12 = new javax.swing.JLabel();
-        btnSave = new javax.swing.JButton();
+        btnguardar = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
+        cbSucursal = new javax.swing.JComboBox<>();
 
         jLabel9.setText("Tipo documento ");
 
@@ -56,9 +78,9 @@ public class AddUserForm extends javax.swing.JDialog {
 
         jLabel2.setText("Nombre");
 
-        txtName.addActionListener(new java.awt.event.ActionListener() {
+        txtNombre.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtNameActionPerformed(evt);
+                txtNombreActionPerformed(evt);
             }
         });
 
@@ -69,9 +91,9 @@ public class AddUserForm extends javax.swing.JDialog {
         jLabel7.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel7.setText("Formulario de empleados ");
 
-        txtIDNumber.addActionListener(new java.awt.event.ActionListener() {
+        txtDocumento.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtIDNumberActionPerformed(evt);
+                txtDocumentoActionPerformed(evt);
             }
         });
 
@@ -79,20 +101,20 @@ public class AddUserForm extends javax.swing.JDialog {
 
         jLabel11.setText("Correo");
 
-        cbIDType.setModel(enumTipoDocumento);
-        cbIDType.addActionListener(new java.awt.event.ActionListener() {
+        cbTipoDocumento.setModel(enumTipoDocumento);
+        cbTipoDocumento.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbIDTypeActionPerformed(evt);
+                cbTipoDocumentoActionPerformed(evt);
             }
         });
 
         jLabel12.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Assets/newUser.png"))); // NOI18N
 
-        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Assets/confirmIcon.png"))); // NOI18N
-        btnSave.setText("Guardar");
-        btnSave.addActionListener(new java.awt.event.ActionListener() {
+        btnguardar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Assets/confirmIcon.png"))); // NOI18N
+        btnguardar.setText("Guardar");
+        btnguardar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSaveActionPerformed(evt);
+                btnguardarActionPerformed(evt);
             }
         });
 
@@ -103,6 +125,8 @@ public class AddUserForm extends javax.swing.JDialog {
                 btnCancelActionPerformed(evt);
             }
         });
+
+        jLabel6.setText("Sucursal");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -120,20 +144,22 @@ public class AddUserForm extends javax.swing.JDialog {
                     .addComponent(jLabel3)
                     .addComponent(jLabel10)
                     .addComponent(jLabel11)
-                    .addComponent(jLabel5))
-                .addGap(47, 47, 47)
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel6))
+                .addGap(53, 53, 53)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(btnSave)
+                        .addComponent(btnguardar)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnCancel))
-                    .addComponent(txtEmail)
-                    .addComponent(txtIDNumber)
-                    .addComponent(txtLastName)
-                    .addComponent(cbIDType, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtCorreo)
+                    .addComponent(txtDocumento)
+                    .addComponent(txtApellidos)
+                    .addComponent(cbTipoDocumento, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(cbSucursal, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(48, 48, 48)
                 .addComponent(jLabel12)
                 .addGap(47, 47, 47))
@@ -150,28 +176,32 @@ public class AddUserForm extends javax.swing.JDialog {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel2))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel3)
-                            .addComponent(txtLastName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(txtApellidos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel5)
-                            .addComponent(cbIDType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(cbTipoDocumento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel10)
-                            .addComponent(txtIDNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(txtDocumento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel11)
-                            .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(txtCorreo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(jLabel12))
-                .addGap(76, 76, 76)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel6)
+                    .addComponent(cbSucursal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(49, 49, 49)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnSave)
+                    .addComponent(btnguardar)
                     .addComponent(btnCancel))
                 .addGap(145, 145, 145))
         );
@@ -196,58 +226,58 @@ public class AddUserForm extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNameActionPerformed
+    private void txtNombreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNombreActionPerformed
         
-    }//GEN-LAST:event_txtNameActionPerformed
+    }//GEN-LAST:event_txtNombreActionPerformed
 
-    private void txtIDNumberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIDNumberActionPerformed
+    private void txtDocumentoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDocumentoActionPerformed
         
-    }//GEN-LAST:event_txtIDNumberActionPerformed
+    }//GEN-LAST:event_txtDocumentoActionPerformed
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         this.dispose();
     }//GEN-LAST:event_btnCancelActionPerformed
 
-    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        String name = txtName.getText();
-        String lastName = txtLastName.getText();
-        // || c.c| c.e| L| P.| OTRO | Lo tiene que devolver en string en lista, obteniendo ese texto
-        // valor de la ista desplegable que se selecciono
-        String idType = cbIDType.getSelectedItem().toString();
-        // Posicion de la lista desplegable seleccionada
-        int listPosition = cbIDType.getSelectedIndex();
-        String idNumber = txtIDNumber.getText();
-        String email = txtEmail.getText();
-
-        // Validamos que se capture corectamente 
-        System.out.println("Nombre: " + name + " " + lastName
-                + ", Documento: " + idType + " " + idNumber + " "
-                + "Correo electronico: " + idNumber);
-        // validamos que todos los campos del formulario hubieran sido ingresados
-        if (name.isEmpty() || lastName.isEmpty() || idNumber.isEmpty() || email.isEmpty()) {
+    private void btnguardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnguardarActionPerformed
+        String nombre = txtNombre.getText();
+        String apellidos = txtApellidos.getText();
+        String tipoDocumento =  cbTipoDocumento.getSelectedItem().toString();
+        String documento = txtDocumento.getText();
+        String correo = txtCorreo.getText();
+        String sucursal = cbSucursal.getSelectedItem().toString();
+        
+        if (nombre.isEmpty() || apellidos.isEmpty() || documento.isEmpty() || correo.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Faltan campos por dilingenciar", "Registro", JOptionPane.WARNING_MESSAGE);
         } else {
-            String query = "INSERT INTO `empleados`( `nombreEmp`, `apellidos`, `tipoDocumento`, `documento`, `correo`) VALUES ('" + name + "','" + lastName + "','" + idType + "','" + idNumber + "','" + email + "')";
+            String queryIdSucursal = "SELECT idSucursal FROM `sucursal` WHERE nombreSucursal = '"+sucursal+"';";
             try {
                 connection = conexion.getConnection();
                 st = connection.createStatement();
-                st.executeUpdate(query);
-                JOptionPane.showMessageDialog(this, "El usuario ha sido registrado");
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(this, "No se pudo crear el usuario", "empleados", JOptionPane.ERROR_MESSAGE);
+                rs = st.executeQuery(queryIdSucursal);
+                while(rs.next()){
+                    int idSucursal = rs.getInt("idSucursal");
+                    String query = "INSERT INTO `empleado`( `nombreEmp`, `apellidos`, `tipoDocumento`, `documento`, `correo`, `FK_idSucursal`) VALUES ('" + nombre + "','" + apellidos + "','" + tipoDocumento + "','" + documento + "','" + correo + "', " + idSucursal + ")";
+                    System.out.println(query);
+                    try {
+                        st.executeUpdate(query);
+                        JOptionPane.showMessageDialog(this, "El usuario ha sido registrado");
+                    } catch (SQLException e) {
+                       JOptionPane.showMessageDialog(this, "No se pudo crear el usuario", "empleados", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            } catch (SQLException e){
+                System.out.println(e);
             }
             this.dispose();
-        }
-        
-    }//GEN-LAST:event_btnSaveActionPerformed
+            
+        } 
+    }//GEN-LAST:event_btnguardarActionPerformed
 
-    private void cbIDTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbIDTypeActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cbIDTypeActionPerformed
+    private void cbTipoDocumentoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbTipoDocumentoActionPerformed
+         
+    }//GEN-LAST:event_cbTipoDocumentoActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -271,7 +301,6 @@ public class AddUserForm extends javax.swing.JDialog {
             java.util.logging.Logger.getLogger(AddUserForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-        //</editor-fold>
 
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -290,8 +319,9 @@ public class AddUserForm extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
-    private javax.swing.JButton btnSave;
-    private javax.swing.JComboBox<String> cbIDType;
+    private javax.swing.JButton btnguardar;
+    private javax.swing.JComboBox<Sucursal> cbSucursal;
+    private javax.swing.JComboBox<String> cbTipoDocumento;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -299,12 +329,13 @@ public class AddUserForm extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JTextField txtEmail;
-    private javax.swing.JTextField txtIDNumber;
-    private javax.swing.JTextField txtLastName;
-    private javax.swing.JTextField txtName;
+    private javax.swing.JTextField txtApellidos;
+    private javax.swing.JTextField txtCorreo;
+    private javax.swing.JTextField txtDocumento;
+    private javax.swing.JTextField txtNombre;
     // End of variables declaration//GEN-END:variables
 }
